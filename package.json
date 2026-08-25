@@ -14,6 +14,9 @@
     "build:core": "npm run build --workspace=core",
     "build:portal": "npm run build --workspace=portal",
     "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:core": "npm run test --workspace=core",
+    "test:portal": "npm run test --workspace=portal",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },

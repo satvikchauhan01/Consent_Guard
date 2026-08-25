@@ -1,0 +1,27 @@
+{
+  "name": "consentguard-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ConsentGuard - Dynamic Consent Management System Monorepo",
+  "workspaces": [
+    "core",
+    "portal",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:core": "npm run dev --workspace=core",
+    "dev:portal": "npm run dev --workspace=portal",
+    "build:core": "npm run build --workspace=core",
+    "build:portal": "npm run build --workspace=portal",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}

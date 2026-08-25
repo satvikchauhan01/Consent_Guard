@@ -73,3 +73,11 @@ The `/api/consents/check` decision engine evaluates rules top-to-bottom (first m
 - **Portal Staff:** `Portal Staff` is a **portal-local role** with **no Core role and no Core JWT — ever**.
   - All portal backend calls made on behalf of staff (checks, stream, audit) authenticate strictly via the `ConsumerApplication` API key.
   - Core `ADMIN` credentials are never issued to or forwarded by consumer application staff.
+
+---
+
+## 7. Application Scopes (3 Defined Scopes)
+
+- `consent:check` — Authorizes evaluation of `/api/consents/check`.
+- `consent:stream` — Authorizes real-time SSE stream subscription `/api/consents/stream`.
+- `audit:read` — Authorizes reading application-scoped audit events `/api/consents/audit` & summaries.

@@ -7,9 +7,38 @@ on:
     branches: [master, main]
 
 jobs:
-  build-and-test:
-    name: Build, Lint & Test
+  lint-and-format:
+    name: Lint & Format
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check code formatting
+        run: npx prettier --check "**/*.{ts,tsx,js,jsx,json,md}" --ignore-path .gitignore
+
+      - name: Run ESLint
+        run: npm run lint
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+
+    env:
+      # NODE_ENV=test prevents src/index.ts from attempting a real MongoDB
+      # connection at boot — tests manage their own in-memory replica set via
+      # mongodb-memory-server, so no external database is needed in CI.
+      NODE_ENV: test
 
     steps:
       - name: Checkout repository
@@ -27,14 +56,30 @@ jobs:
       - name: Prepare environment file
         run: cp .env.example .env
 
-      - name: Check code formatting
-        run: npx prettier --check "**/*.{ts,tsx,js,jsx,json,md}"
-
-      - name: Run ESLint
-        run: npm run lint
-
-      - name: Build all workspaces
-        run: npm run build
-
       - name: Run test suites
         run: npm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    # Build runs after tests pass — no point building broken code
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare environment file
+        run: cp .env.example .env
+
+      - name: Build core workspace
+        run: npm run build:core

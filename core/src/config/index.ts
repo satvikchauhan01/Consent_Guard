@@ -26,6 +26,8 @@ export const envSchema = z.object({
 
   // Security & Secrets
   JWT_SECRET: z.string().min(16, "JWT_SECRET is required (min 16 chars)"),
+  JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
+  JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
   SESSION_COOKIE_SECRET: z.string().min(16, "SESSION_COOKIE_SECRET is required (min 16 chars)"),
   HMAC_KEY: z.string().min(16, "HMAC_KEY is required (min 16 chars)"),
 

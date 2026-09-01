@@ -40,3 +40,9 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
+
+# Internal planning and architecture documents
+GEMINI.md
+ConsentGuard_Build_Roadmap.md
+ConsentGuard_Architecture*.md
+

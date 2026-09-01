@@ -43,17 +43,10 @@ const BASE = "/api/auth";
 const VALID_EMAIL = "alice@example.com";
 const VALID_PASSWORD = "SecurePass123";
 
-async function registerAndLogin(
-  email = VALID_EMAIL,
-  password = VALID_PASSWORD
-) {
-  await request(app)
-    .post(`${BASE}/register`)
-    .send({ email, password });
+async function registerAndLogin(email = VALID_EMAIL, password = VALID_PASSWORD) {
+  await request(app).post(`${BASE}/register`).send({ email, password });
 
-  const res = await request(app)
-    .post(`${BASE}/login`)
-    .send({ email, password });
+  const res = await request(app).post(`${BASE}/login`).send({ email, password });
 
   return res.body as { accessToken: string; refreshToken: string };
 }
@@ -161,9 +154,7 @@ describe("POST /api/auth/refresh", () => {
   it("Test 7 — returns new accessToken and refreshToken on valid refresh", async () => {
     const { refreshToken } = await registerAndLogin();
 
-    const res = await request(app)
-      .post(`${BASE}/refresh`)
-      .send({ refreshToken });
+    const res = await request(app).post(`${BASE}/refresh`).send({ refreshToken });
 
     expect(res.status).toBe(200);
     expect(typeof res.body.accessToken).toBe("string");
@@ -172,26 +163,21 @@ describe("POST /api/auth/refresh", () => {
     expect(res.body.refreshToken).not.toBe(refreshToken);
   });
 
-  it(
-    "Test 8 (ACCEPTANCE) — replaying an already-rotated refresh token returns 401 REFRESH_TOKEN_REVOKED",
-    async () => {
-      const { refreshToken: originalToken } = await registerAndLogin();
+  it("Test 8 (ACCEPTANCE) — replaying an already-rotated refresh token returns 401 REFRESH_TOKEN_REVOKED", async () => {
+    const { refreshToken: originalToken } = await registerAndLogin();
 
-      // First use — valid rotation
-      const firstRotate = await request(app)
-        .post(`${BASE}/refresh`)
-        .send({ refreshToken: originalToken });
-      expect(firstRotate.status).toBe(200);
+    // First use — valid rotation
+    const firstRotate = await request(app)
+      .post(`${BASE}/refresh`)
+      .send({ refreshToken: originalToken });
+    expect(firstRotate.status).toBe(200);
 
-      // Replay the OLD token — must be rejected
-      const replay = await request(app)
-        .post(`${BASE}/refresh`)
-        .send({ refreshToken: originalToken });
+    // Replay the OLD token — must be rejected
+    const replay = await request(app).post(`${BASE}/refresh`).send({ refreshToken: originalToken });
 
-      expect(replay.status).toBe(401);
-      expect(replay.body.error).toBe("REFRESH_TOKEN_REVOKED");
-    }
-  );
+    expect(replay.status).toBe(401);
+    expect(replay.body.error).toBe("REFRESH_TOKEN_REVOKED");
+  });
 
   it("Test 9 — returns 401 REFRESH_TOKEN_EXPIRED for an expired refresh token", async () => {
     const { refreshToken } = await registerAndLogin();
@@ -204,9 +190,7 @@ describe("POST /api/auth/refresh", () => {
       { expiresAt: new Date(Date.now() - 1000) } // 1 second in the past
     );
 
-    const res = await request(app)
-      .post(`${BASE}/refresh`)
-      .send({ refreshToken });
+    const res = await request(app).post(`${BASE}/refresh`).send({ refreshToken });
 
     expect(res.status).toBe(401);
     expect(res.body.error).toBe("REFRESH_TOKEN_EXPIRED");
@@ -214,37 +198,28 @@ describe("POST /api/auth/refresh", () => {
 });
 
 describe("Access Token expiry", () => {
-  it(
-    "Test 10 (ACCEPTANCE) — an expired access JWT is rejected by jwt.verify",
-    () => {
-      // Sign a token with -1s expiry (already expired at the moment of creation)
-      const expiredToken = jwt.sign(
-        { userId: "000000000000000000000001", role: "USER" },
-        config.JWT_SECRET,
-        { expiresIn: -1 }
-      );
+  it("Test 10 (ACCEPTANCE) — an expired access JWT is rejected by jwt.verify", () => {
+    // Sign a token with -1s expiry (already expired at the moment of creation)
+    const expiredToken = jwt.sign(
+      { userId: "000000000000000000000001", role: "USER" },
+      config.JWT_SECRET,
+      { expiresIn: -1 }
+    );
 
-      expect(() => jwt.verify(expiredToken, config.JWT_SECRET)).toThrow(
-        jwt.TokenExpiredError
-      );
-    }
-  );
+    expect(() => jwt.verify(expiredToken, config.JWT_SECRET)).toThrow(jwt.TokenExpiredError);
+  });
 });
 
 describe("POST /api/auth/logout", () => {
   it("Test 11 — returns 204 on valid logout; same token is then rejected", async () => {
     const { refreshToken } = await registerAndLogin();
 
-    const logoutRes = await request(app)
-      .post(`${BASE}/logout`)
-      .send({ refreshToken });
+    const logoutRes = await request(app).post(`${BASE}/logout`).send({ refreshToken });
 
     expect(logoutRes.status).toBe(204);
 
     // Attempting to use the now-revoked token must fail
-    const refreshRes = await request(app)
-      .post(`${BASE}/refresh`)
-      .send({ refreshToken });
+    const refreshRes = await request(app).post(`${BASE}/refresh`).send({ refreshToken });
 
     expect(refreshRes.status).toBe(401);
     expect(refreshRes.body.error).toBe("REFRESH_TOKEN_REVOKED");

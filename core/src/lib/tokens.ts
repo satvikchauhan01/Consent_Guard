@@ -10,10 +10,7 @@ import { config } from "../config/index.js";
 // Argon2 (that's for low-entropy passwords); HMAC is fast and correct here.
 
 export function hashToken(rawToken: string): string {
-  return crypto
-    .createHmac("sha256", config.HMAC_KEY)
-    .update(rawToken)
-    .digest("hex");
+  return crypto.createHmac("sha256", config.HMAC_KEY).update(rawToken).digest("hex");
 }
 
 export function generateRawToken(): string {

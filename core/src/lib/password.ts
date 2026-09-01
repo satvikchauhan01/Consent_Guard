@@ -17,8 +17,8 @@ import { hash, verify, argon2id, type HashOptions } from "argon2";
 
 const ARGON2_OPTIONS: HashOptions & { raw?: false } = {
   type: argon2id,
-  memoryCost: 65536,  // 64 MiB
-  timeCost: 3,        // 3 iterations
+  memoryCost: 65536, // 64 MiB
+  timeCost: 3, // 3 iterations
   parallelism: 1,
 };
 
@@ -26,10 +26,7 @@ export async function hashPassword(plaintext: string): Promise<string> {
   return hash(plaintext, ARGON2_OPTIONS);
 }
 
-export async function verifyPassword(
-  plaintext: string,
-  digest: string
-): Promise<boolean> {
+export async function verifyPassword(plaintext: string, digest: string): Promise<boolean> {
   try {
     return await verify(digest, plaintext);
   } catch {
@@ -45,8 +42,7 @@ export async function verifyPassword(
 // static hash to prevent timing-based user enumeration attacks. The dummy
 // hash is pre-computed from "dummy-password-for-timing".
 
-const DUMMY_HASH =
-  "$argon2id$v=19$m=65536,t=3,p=1$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG";
+const DUMMY_HASH = "$argon2id$v=19$m=65536,t=3,p=1$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG";
 
 export async function dummyVerify(): Promise<void> {
   await verify(DUMMY_HASH, "dummy-password-for-timing").catch(() => {});

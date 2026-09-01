@@ -34,7 +34,9 @@ function findIndex(
     const keysEntries = Object.entries(keys);
     const targetEntries = Object.entries(keyPattern);
     if (keysEntries.length !== targetEntries.length) return false;
-    return keysEntries.every(([k, v], idx) => targetEntries[idx][0] === k && targetEntries[idx][1] === v);
+    return keysEntries.every(
+      ([k, v], idx) => targetEntries[idx][0] === k && targetEntries[idx][1] === v
+    );
   }) as [Record<string, number>, Record<string, unknown> | undefined] | undefined;
 }
 
@@ -230,14 +232,20 @@ describe("Step 4 — Mongoose Schemas & Indexes (All 8 Entities)", () => {
 
     it("defines references: userId, applicationId, purposeId, policyVersionId", () => {
       expect((consentRecordSchema.path("userId") as any).options.ref).toBe("User");
-      expect((consentRecordSchema.path("applicationId") as any).options.ref).toBe("ConsumerApplication");
+      expect((consentRecordSchema.path("applicationId") as any).options.ref).toBe(
+        "ConsumerApplication"
+      );
       expect((consentRecordSchema.path("purposeId") as any).options.ref).toBe("ConsentPurpose");
-      expect((consentRecordSchema.path("policyVersionId") as any).options.ref).toBe("PolicyVersion");
+      expect((consentRecordSchema.path("policyVersionId") as any).options.ref).toBe(
+        "PolicyVersion"
+      );
     });
 
     it("defines status enum [NOT_GRANTED, GRANTED, WITHDRAWN] and optimistic concurrency version counter", () => {
       const statusPath = consentRecordSchema.path("status") as any;
-      expect(statusPath.enumValues).toEqual(expect.arrayContaining(["NOT_GRANTED", "GRANTED", "WITHDRAWN"]));
+      expect(statusPath.enumValues).toEqual(
+        expect.arrayContaining(["NOT_GRANTED", "GRANTED", "WITHDRAWN"])
+      );
       expect(statusPath.defaultValue).toBe(ConsentStatus.NOT_GRANTED);
 
       const versionPath = consentRecordSchema.path("version") as any;
@@ -345,7 +353,9 @@ describe("Step 4 — Mongoose Schemas & Indexes (All 8 Entities)", () => {
 
     it("defines required applicationId ref, key, requestHash, responseSnapshot", () => {
       expect((idempotencyKeySchema.path("applicationId") as any).isRequired).toBe(true);
-      expect((idempotencyKeySchema.path("applicationId") as any).options.ref).toBe("ConsumerApplication");
+      expect((idempotencyKeySchema.path("applicationId") as any).options.ref).toBe(
+        "ConsumerApplication"
+      );
       expect((idempotencyKeySchema.path("key") as any).isRequired).toBe(true);
       expect((idempotencyKeySchema.path("requestHash") as any).isRequired).toBe(true);
       expect((idempotencyKeySchema.path("responseSnapshot") as any).isRequired).toBe(true);

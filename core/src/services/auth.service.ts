@@ -2,16 +2,8 @@ import mongoose from "mongoose";
 import { config } from "../config/index.js";
 import { User, UserRole } from "../models/user.model.js";
 import { RefreshToken } from "../models/refreshToken.model.js";
-import {
-  hashPassword,
-  verifyPassword,
-  dummyVerify,
-} from "../lib/password.js";
-import {
-  hashToken,
-  generateRawToken,
-  generateAccessToken,
-} from "../lib/tokens.js";
+import { hashPassword, verifyPassword, dummyVerify } from "../lib/password.js";
+import { hashToken, generateRawToken, generateAccessToken } from "../lib/tokens.js";
 
 // ---------------------------------------------------------------------------
 // Typed error codes — consumed by the controller to set HTTP status codes
@@ -129,11 +121,7 @@ export async function rotateRefreshToken(rawToken: string) {
   const existingToken = await RefreshToken.findOne({ tokenHash });
 
   if (!existingToken) {
-    throw new AuthError(
-      "INVALID_REFRESH_TOKEN",
-      "Refresh token not found",
-      401
-    );
+    throw new AuthError("INVALID_REFRESH_TOKEN", "Refresh token not found", 401);
   }
 
   if (existingToken.revokedAt != null) {
@@ -145,11 +133,7 @@ export async function rotateRefreshToken(rawToken: string) {
   }
 
   if (existingToken.expiresAt < new Date()) {
-    throw new AuthError(
-      "REFRESH_TOKEN_EXPIRED",
-      "Refresh token has expired",
-      401
-    );
+    throw new AuthError("REFRESH_TOKEN_EXPIRED", "Refresh token has expired", 401);
   }
 
   // Fetch user to embed fresh role claim in the new access token
@@ -173,10 +157,7 @@ export async function rotateRefreshToken(rawToken: string) {
       const newHash = hashToken(newRawToken);
       const expiresAt = getRefreshExpiryDate();
 
-      await RefreshToken.create(
-        [{ userId: user._id, tokenHash: newHash, expiresAt }],
-        { session }
-      );
+      await RefreshToken.create([{ userId: user._id, tokenHash: newHash, expiresAt }], { session });
     });
   } finally {
     await session.endSession();
@@ -200,11 +181,7 @@ export async function revokeRefreshToken(rawToken: string) {
   const tokenDoc = await RefreshToken.findOne({ tokenHash });
 
   if (!tokenDoc || tokenDoc.revokedAt != null) {
-    throw new AuthError(
-      "INVALID_REFRESH_TOKEN",
-      "Refresh token not found or already revoked",
-      401
-    );
+    throw new AuthError("INVALID_REFRESH_TOKEN", "Refresh token not found or already revoked", 401);
   }
 
   tokenDoc.revokedAt = new Date();
